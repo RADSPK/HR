@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -641,7 +642,7 @@
 </head>
 <body>
     <!-- Password Protection Overlay -->
-    <div class="login-overlay" id="loginOverlay">
+    <div class="login-overlay hidden" id="loginOverlay">
         <div class="login-box">
             <h1>🔐 HR Dashboard</h1>
             <p>Research & Development Solutions</p>
@@ -845,16 +846,10 @@
         
         // Authentication functions
         function checkAuthentication() {
-            const isAuthenticated = sessionStorage.getItem('hrDashboardAuth') === 'true';
+            // Password protection disabled in this version
             const loginOverlay = document.getElementById('loginOverlay');
-            
-            if (isAuthenticated) {
-                loginOverlay.classList.add('hidden');
-            } else {
-                loginOverlay.classList.remove('hidden');
-            }
-            
-            return isAuthenticated;
+            loginOverlay.classList.add('hidden');
+            return true;
         }
 
         function logout() {
@@ -864,19 +859,28 @@
 
         // Login form handler
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard loaded, setting up login...');
             const loginForm = document.getElementById('loginForm');
             const passwordInput = document.getElementById('passwordInput');
             const loginError = document.getElementById('loginError');
+            
+            console.log('Login form found:', !!loginForm);
+            console.log('Password input found:', !!passwordInput);
+            console.log('Expected password:', DASHBOARD_PASSWORD);
             
             // Check authentication on page load
             checkAuthentication();
             
             loginForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                console.log('Form submitted');
                 
-                const enteredPassword = passwordInput.value;
+                const enteredPassword = passwordInput.value.trim();
+                console.log('Entered password:', enteredPassword);
+                console.log('Match:', enteredPassword === DASHBOARD_PASSWORD);
                 
                 if (enteredPassword === DASHBOARD_PASSWORD) {
+                    console.log('✅ Password correct!');
                     // Correct password
                     sessionStorage.setItem('hrDashboardAuth', 'true');
                     document.getElementById('loginOverlay').classList.add('hidden');
@@ -888,6 +892,7 @@
                         loadDataFromGoogleSheets();
                     }, 100);
                 } else {
+                    console.log('❌ Password incorrect!');
                     // Wrong password
                     loginError.classList.add('show');
                     passwordInput.value = '';
