@@ -641,71 +641,7 @@
 </head>
 <body>
     <!-- Password Protection Overlay -->
-    <div class="login-overlay" id="loginOverlay">
-        <div class="login-box">
-            <h1>🔐 HR Dashboard</h1>
-            <p>Research & Development Solutions</p>
-            <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 2px solid #28a745;">
-                <p style="margin: 0; color: #155724; font-size: 16px; font-weight: bold;">Default Password: rads2025</p>
-            </div>
-            <input 
-                type="text" 
-                class="login-input" 
-                id="passwordInput" 
-                placeholder="Type: rads2025"
-                autocomplete="off"
-            />
-            <div class="login-error" id="loginError" style="display: none; color: #dc3545; margin: 10px 0;">
-                ❌ Incorrect password. Try again.
-            </div>
-            <button onclick="checkPassword()" class="login-button">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </button>
-        </div>
-    </div>
-
-    <script>
-        // ULTRA SIMPLE PASSWORD CHECK
-        function checkPassword() {
-            const input = document.getElementById('passwordInput');
-            const error = document.getElementById('loginError');
-            const overlay = document.getElementById('loginOverlay');
-            const password = input.value;
-            
-            console.log('Password entered:', password);
-            console.log('Expected: rads2025');
-            console.log('Match:', password === 'rads2025');
-            
-            if (password === 'rads2025') {
-                alert('✅ Login Successful!');
-                overlay.style.display = 'none';
-                error.style.display = 'none';
-                
-                // Load data
-                if (typeof loadDataFromGoogleSheets === 'function') {
-                    loadDataFromGoogleSheets();
-                }
-            } else {
-                alert('❌ Wrong password! Type exactly: rads2025');
-                error.style.display = 'block';
-                input.value = '';
-                input.focus();
-            }
-        }
-        
-        // Allow Enter key to submit
-        document.addEventListener('DOMContentLoaded', function() {
-            const input = document.getElementById('passwordInput');
-            if (input) {
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        checkPassword();
-                    }
-                });
-                input.focus();
-            }
-        });
-    </script>
+    <!-- NO PASSWORD - Dashboard loads directly -->
 
     <div class="dashboard-container">
         <!-- Sidebar -->
@@ -898,12 +834,23 @@
         document.head.appendChild(style);
 
         // ===================================================
-        // DASHBOARD CODE
+        // ⚠️ IMPORTANT: CONFIGURE YOUR GOOGLE SHEETS URL HERE
         // ===================================================
-
-        // Google Sheets CSV Configuration
+        // 
+        // STEP 1: Open your Google Sheet
+        // STEP 2: Click File → Share → Publish to web
+        // STEP 3: Choose "Entire Document" and "Comma-separated values (.csv)"
+        // STEP 4: Click "Publish" and copy the URL
+        // STEP 5: Paste the URL below (replace the existing URL)
+        //
+        // Example URL format:
+        // https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID/pub?output=csv
+        //
         const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTf2qj4n3jmOGT1vkd1QUChdZbazTynus5-AgNUTrGPfGjbmLoWWKk_YneSHnNWjMphgDmcmt_m5Ac/pub?output=csv';
-        const AUTO_REFRESH_INTERVAL = 300000; // 5 minutes
+        
+        // Auto-refresh interval (5 minutes = 300000 milliseconds)
+        const AUTO_REFRESH_INTERVAL = 300000;
+        // ===================================================
 
         let employees = [];
         let mockTransactionLog = [];
