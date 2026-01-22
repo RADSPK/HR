@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -642,29 +641,71 @@
 </head>
 <body>
     <!-- Password Protection Overlay -->
-    <div class="login-overlay hidden" id="loginOverlay">
+    <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <h1>🔐 HR Dashboard</h1>
             <p>Research & Development Solutions</p>
-            <form class="login-form" id="loginForm">
-                <input 
-                    type="password" 
-                    class="login-input" 
-                    id="passwordInput" 
-                    placeholder="Enter Password"
-                    required
-                    autocomplete="off"
-                />
-                <div class="login-error" id="loginError">❌ Incorrect password. Please try again.</div>
-                <button type="submit" class="login-button">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </button>
-            </form>
-            <p style="margin-top: 20px; font-size: 12px; color: #999;">
-                Session expires when browser is closed
-            </p>
+            <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 2px solid #28a745;">
+                <p style="margin: 0; color: #155724; font-size: 16px; font-weight: bold;">Default Password: rads2025</p>
+            </div>
+            <input 
+                type="text" 
+                class="login-input" 
+                id="passwordInput" 
+                placeholder="Type: rads2025"
+                autocomplete="off"
+            />
+            <div class="login-error" id="loginError" style="display: none; color: #dc3545; margin: 10px 0;">
+                ❌ Incorrect password. Try again.
+            </div>
+            <button onclick="checkPassword()" class="login-button">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
         </div>
     </div>
+
+    <script>
+        // ULTRA SIMPLE PASSWORD CHECK
+        function checkPassword() {
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('loginError');
+            const overlay = document.getElementById('loginOverlay');
+            const password = input.value;
+            
+            console.log('Password entered:', password);
+            console.log('Expected: rads2025');
+            console.log('Match:', password === 'rads2025');
+            
+            if (password === 'rads2025') {
+                alert('✅ Login Successful!');
+                overlay.style.display = 'none';
+                error.style.display = 'none';
+                
+                // Load data
+                if (typeof loadDataFromGoogleSheets === 'function') {
+                    loadDataFromGoogleSheets();
+                }
+            } else {
+                alert('❌ Wrong password! Type exactly: rads2025');
+                error.style.display = 'block';
+                input.value = '';
+                input.focus();
+            }
+        }
+        
+        // Allow Enter key to submit
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('passwordInput');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+                input.focus();
+            }
+        });
+    </script>
 
     <div class="dashboard-container">
         <!-- Sidebar -->
@@ -839,74 +880,11 @@
 
     <script>
         // ===================================================
-        // PASSWORD PROTECTION
+        // SIMPLIFIED PASSWORD - LOGOUT FUNCTION ONLY
         // ===================================================
-        // CHANGE YOUR PASSWORD HERE:
-        const DASHBOARD_PASSWORD = 'rads2025';  // ← Change this to your password
-        
-        // Authentication functions
-        function checkAuthentication() {
-            // Password protection disabled in this version
-            const loginOverlay = document.getElementById('loginOverlay');
-            loginOverlay.classList.add('hidden');
-            return true;
-        }
-
         function logout() {
-            sessionStorage.removeItem('hrDashboardAuth');
             location.reload();
         }
-
-        // Login form handler
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard loaded, setting up login...');
-            const loginForm = document.getElementById('loginForm');
-            const passwordInput = document.getElementById('passwordInput');
-            const loginError = document.getElementById('loginError');
-            
-            console.log('Login form found:', !!loginForm);
-            console.log('Password input found:', !!passwordInput);
-            console.log('Expected password:', DASHBOARD_PASSWORD);
-            
-            // Check authentication on page load
-            checkAuthentication();
-            
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                console.log('Form submitted');
-                
-                const enteredPassword = passwordInput.value.trim();
-                console.log('Entered password:', enteredPassword);
-                console.log('Match:', enteredPassword === DASHBOARD_PASSWORD);
-                
-                if (enteredPassword === DASHBOARD_PASSWORD) {
-                    console.log('✅ Password correct!');
-                    // Correct password
-                    sessionStorage.setItem('hrDashboardAuth', 'true');
-                    document.getElementById('loginOverlay').classList.add('hidden');
-                    loginError.classList.remove('show');
-                    passwordInput.value = '';
-                    
-                    // Load data after successful login
-                    setTimeout(() => {
-                        loadDataFromGoogleSheets();
-                    }, 100);
-                } else {
-                    console.log('❌ Password incorrect!');
-                    // Wrong password
-                    loginError.classList.add('show');
-                    passwordInput.value = '';
-                    passwordInput.focus();
-                    
-                    // Shake animation
-                    const loginBox = document.querySelector('.login-box');
-                    loginBox.style.animation = 'shake 0.5s';
-                    setTimeout(() => {
-                        loginBox.style.animation = '';
-                    }, 500);
-                }
-            });
-        });
 
         // Add shake animation
         const style = document.createElement('style');
@@ -1800,8 +1778,10 @@
                 const totalCost = parseFloat(emp['Total Cost to Company'] || 0);
                 
                 return `
-                    <tr>
-                        <td>${emp.Name || 'N/A'}</td>
+                    <tr onclick="openDetailsModal(employees[${idx}])" style="cursor: pointer;" 
+                        onmouseenter="this.style.backgroundColor='var(--border-color)'" 
+                        onmouseleave="this.style.backgroundColor=''">
+                        <td><strong>${emp.Name || 'N/A'}</strong></td>
                         <td>${emp.Department || 'N/A'}</td>
                         <td>PKR ${baseSalary.toLocaleString()}</td>
                         <td>PKR ${travelAllowance.toLocaleString()}</td>
@@ -1810,7 +1790,7 @@
                         <td>PKR ${pf.toLocaleString()}</td>
                         <td>PKR ${eobi.toLocaleString()}</td>
                         <td><strong>PKR ${totalCost.toLocaleString()}</strong></td>
-                        <td>
+                        <td onclick="event.stopPropagation()">
                             <button class="action-buttons primary" onclick="editEmployee(${idx})"><i class="fas fa-edit"></i></button>
                             <button class="action-buttons secondary" onclick="deleteEmployee(${idx})"><i class="fas fa-trash"></i></button>
                         </td>
@@ -1956,12 +1936,36 @@
             data.forEach((employee) => {
                 const row = document.createElement('tr');
                 const originalIndex = employees.findIndex(e => e.ID === employee.ID);
+                
+                // Make row clickable to show details
+                row.style.cursor = 'pointer';
+                row.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on action buttons
+                    if (!e.target.closest('button') && !e.target.closest('.table-actions')) {
+                        openDetailsModal(employees[originalIndex]);
+                    }
+                });
+                
+                // Add hover effect
+                row.addEventListener('mouseenter', function() {
+                    row.style.backgroundColor = 'var(--border-color)';
+                });
+                row.addEventListener('mouseleave', function() {
+                    row.style.backgroundColor = '';
+                });
+                
                 columns.forEach(col => {
                     const cell = document.createElement('td');
-                    if (col === 'Name') cell.innerHTML = `<a href="#" onclick="openDetailsModal(employees[${originalIndex}])">${employee[col]}</a>`;
-                    else if (col === 'Status') cell.innerHTML = `<span class="status-badge status-${(employee[col] || '').toLowerCase().replace('-', '')}">${employee[col] || 'N/A'}</span>`;
-                    else if (col === 'Actions') cell.innerHTML = `<div class="table-actions"><button onclick="openEmployeeModal(employees[${originalIndex}])" title="Edit"><i class="fas fa-edit"></i></button><button onclick="deleteEmployee(${originalIndex})" title="Delete"><i class="fas fa-trash"></i></button></div>`;
-                    else if (col === 'PayrollActions') cell.innerHTML = `<div class="table-actions"><button onclick="openPayrollModal(employees[${originalIndex}], ${originalIndex})" title="Edit Payroll"><i class="fas fa-pencil-alt"></i></button></div>`;
+                    if (col === 'Name') cell.innerHTML = `<strong>${employee[col]}</strong>`;
+                    else if (col === 'Status') cell.innerHTML = `<span class="status-badge status-${(employee[col] || '').toLowerCase().replace(/[^a-z]/g, '')}">${employee[col] || 'N/A'}</span>`;
+                    else if (col === 'Actions') {
+                        cell.innerHTML = `<div class="table-actions"><button onclick="event.stopPropagation(); openEmployeeModal(employees[${originalIndex}])" title="Edit"><i class="fas fa-edit"></i></button><button onclick="event.stopPropagation(); deleteEmployee(${originalIndex})" title="Delete"><i class="fas fa-trash"></i></button></div>`;
+                        cell.style.pointerEvents = 'auto';
+                    }
+                    else if (col === 'PayrollActions') {
+                        cell.innerHTML = `<div class="table-actions"><button onclick="event.stopPropagation(); openPayrollModal(employees[${originalIndex}], ${originalIndex})" title="Edit Payroll"><i class="fas fa-pencil-alt"></i></button></div>`;
+                        cell.style.pointerEvents = 'auto';
+                    }
                     else if (['Base Salary', 'Total Cost to Company'].includes(col)) cell.textContent = `PKR ${parseFloat(employee[col] || 0).toLocaleString()}`;
                     else cell.textContent = employee[col] || 'N/A';
                     row.appendChild(cell);
@@ -2311,4 +2315,3 @@
 
 </body>
 </html>
-
