@@ -1123,8 +1123,11 @@
                         const providentFund = parseFloat(mappedEmp['Provident Fund'] || 0);
                         const eobi = parseFloat(mappedEmp['EOBI'] || 0);
                         
-                        const salary = baseSalary + travelAllowance + fuelAllowance + otherAllowance - providentFund - eobi;
-                        const totalCost = baseSalary + travelAllowance + fuelAllowance + otherAllowance;
+                        // Salary = Base Salary + All Allowances (what employee takes home)
+                        const salary = baseSalary + travelAllowance + fuelAllowance + otherAllowance;
+                        
+                        // Total Cost to Company = Salary + PF + EOBI (what organization pays)
+                        const totalCost = baseSalary + travelAllowance + fuelAllowance + otherAllowance + providentFund + eobi;
                         
                         return {
                             ...mappedEmp,
