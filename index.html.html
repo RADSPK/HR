@@ -1321,10 +1321,11 @@
             const avgTenure = tenures.length > 0 ? (tenures.reduce((a, b) => a + b, 0) / tenures.length).toFixed(1) : 0;
             document.getElementById('avg-tenure').textContent = avgTenure;
             
-            // Financial metrics
+            // Financial metrics (total-payroll metric removed per user request)
             const totalPayroll = activeEmployees.reduce((sum, e) => sum + parseFloat(e['Salary'] || 0), 0);
             const totalCTC = activeEmployees.reduce((sum, e) => sum + parseFloat(e['Total Cost to Company'] || 0), 0);
-            document.getElementById('total-payroll').textContent = 'PKR ' + totalPayroll.toLocaleString(undefined, {maximumFractionDigits: 0});
+            // document.getElementById('total-payroll').textContent = 'PKR ' + totalPayroll.toLocaleString(undefined, {maximumFractionDigits: 0}); // REMOVED - element doesn't exist
+            
             
             // Employment type
             const regularCount = employees.filter(e => e['Employment Type'] === 'Regular').length;
