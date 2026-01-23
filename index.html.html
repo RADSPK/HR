@@ -618,7 +618,7 @@
 </head>
 <body>
     <!-- Password Protection Overlay -->
-    <div class="login-overlay" id="loginOverlay">
+    <div class="login-overlay hidden" id="loginOverlay">
         <div class="login-box">
             <h1>🔐 HR Dashboard</h1>
             <p>Research & Development Solutions</p>
@@ -873,59 +873,15 @@
         let mockReportData = [];
 
         // --- DOM Elements ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const body = document.body;
-        const navLinks = document.querySelectorAll('.nav-link[data-page]');
-        const pages = document.querySelectorAll('.page');
-        const pageTitle = document.getElementById('page-title');
-        
-        const employeeModal = document.getElementById('employee-modal');
-        const employeeForm = document.getElementById('employee-form');
-        const employeeProfilePicInput = document.getElementById('employee-profile-pic');
-        const profilePicPreview = document.getElementById('profile-pic-preview');
-        
-        const payrollModal = document.getElementById('payroll-modal');
-        const payrollForm = document.getElementById('payroll-form');
-        const importModal = document.getElementById('import-modal');
-        const importForm = document.getElementById('import-form');
-        
-        const employeesTableBody = document.getElementById('employees-table').querySelector('tbody');
-        const recentHiresTableBody = document.getElementById('recent-hires-table').querySelector('tbody');
-        const payrollTableBody = document.getElementById('payroll-table').querySelector('tbody');
-        const transactionTableBody = document.getElementById('transaction-table').querySelector('tbody');
-        
-        const detailsModal = document.getElementById('details-modal');
-        const departmentGrid = document.getElementById('department-grid');
-        const departmentDetailsModal = document.getElementById('department-details-modal');
-        const departmentDetailsTitle = document.getElementById('department-details-title');
-        const departmentDetailsContent = document.getElementById('department-details-content');
-        
-        const employeeSearch = document.getElementById('employee-search');
-        const genderFilter = document.getElementById('gender-filter');
-        const departmentFilter = document.getElementById('department-filter');
-        const statusFilter = document.getElementById('status-filter');
-        
-        const reportDepartmentSelect = document.getElementById('report-department');
-        const reportForm = document.getElementById('report-form');
-        const downloadReportBtn = document.getElementById('download-report-btn');
-        const reportOutputContent = document.getElementById('report-output-content');
-        
-        const transactionModal = document.getElementById('transaction-modal');
-        const transactionForm = document.getElementById('transaction-form');
-        const dynamicTransactionFields = document.getElementById('dynamic-transaction-fields');
-        const transactionEmployeeSelect = document.getElementById('transaction-employee-id');
-        
-        // --- Theme Management ---
-        (function setupTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                body.classList.add('dark-theme');
-                themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                body.classList.remove('dark-theme');
-                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        })();
+        // --- DOM Elements (will be initialized in DOMContentLoaded) ---
+        let themeToggleBtn, body, navLinks, pages, pageTitle;
+        let employeeModal, employeeForm, employeeProfilePicInput, profilePicPreview;
+        let payrollModal, payrollForm, importModal, importForm;
+        let employeesTableBody, recentHiresTableBody, payrollTableBody, transactionTableBody;
+        let detailsModal, departmentGrid, departmentDetailsModal, departmentDetailsTitle, departmentDetailsContent;
+        let employeeSearch, genderFilter, departmentFilter, statusFilter;
+        let reportDepartmentSelect, reportForm, downloadReportBtn, reportOutputContent;
+        let transactionModal, transactionForm, dynamicTransactionFields, transactionEmployeeSelect;
 
         // --- CSV Data Functions ---
         function parseCSVLine(line) {
@@ -1100,11 +1056,35 @@
 
         // --- Page Navigation ---
         function showPage(pageId) {
+            console.log('showPage called with:', pageId);
+            
+            if (!pages || pages.length === 0) {
+                console.error('ERROR: pages array is empty or null!');
+                return;
+            }
+            
+            console.log('Hiding all pages...');
             pages.forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            pageTitle.textContent = pageId.charAt(0).toUpperCase() + pageId.slice(1);
+            
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                console.log('Showing page:', pageId);
+            } else {
+                console.error('ERROR: Page not found:', pageId);
+                return;
+            }
+            
+            if (pageTitle) {
+                pageTitle.textContent = pageId.charAt(0).toUpperCase() + pageId.slice(1);
+            }
+            
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            document.querySelector(`.nav-link[data-page="${pageId}"]`).classList.add('active');
+            const activeLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+            
             updateUI();
         }
 
@@ -1615,6 +1595,67 @@
         
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize ALL DOM elements first
+            console.log('Initializing dashboard...');
+            
+            themeToggleBtn = document.getElementById('theme-toggle');
+            body = document.body;
+            navLinks = document.querySelectorAll('.nav-link[data-page]');
+            pages = document.querySelectorAll('.page');
+            pageTitle = document.getElementById('page-title');
+            
+            employeeModal = document.getElementById('employee-modal');
+            employeeForm = document.getElementById('employee-form');
+            employeeProfilePicInput = document.getElementById('employee-profile-pic');
+            profilePicPreview = document.getElementById('profile-pic-preview');
+            
+            payrollModal = document.getElementById('payroll-modal');
+            payrollForm = document.getElementById('payroll-form');
+            importModal = document.getElementById('import-modal');
+            importForm = document.getElementById('import-form');
+            
+            employeesTableBody = document.getElementById('employees-table').querySelector('tbody');
+            recentHiresTableBody = document.getElementById('recent-hires-table').querySelector('tbody');
+            payrollTableBody = document.getElementById('payroll-table').querySelector('tbody');
+            transactionTableBody = document.getElementById('transaction-table').querySelector('tbody');
+            
+            detailsModal = document.getElementById('details-modal');
+            departmentGrid = document.getElementById('department-grid');
+            departmentDetailsModal = document.getElementById('department-details-modal');
+            departmentDetailsTitle = document.getElementById('department-details-title');
+            departmentDetailsContent = document.getElementById('department-details-content');
+            
+            employeeSearch = document.getElementById('employee-search');
+            genderFilter = document.getElementById('gender-filter');
+            departmentFilter = document.getElementById('department-filter');
+            statusFilter = document.getElementById('status-filter');
+            
+            reportDepartmentSelect = document.getElementById('report-department');
+            reportForm = document.getElementById('report-form');
+            downloadReportBtn = document.getElementById('download-report-btn');
+            reportOutputContent = document.getElementById('report-output-content');
+            
+            transactionModal = document.getElementById('transaction-modal');
+            transactionForm = document.getElementById('transaction-form');
+            dynamicTransactionFields = document.getElementById('dynamic-transaction-fields');
+            transactionEmployeeSelect = document.getElementById('transaction-employee-id');
+            
+            console.log('DOM elements initialized');
+            console.log('navLinks found:', navLinks ? navLinks.length : 'null');
+            console.log('pages found:', pages ? pages.length : 'null');
+            console.log('themeToggleBtn found:', !!themeToggleBtn);
+            
+            // Setup theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-theme');
+                if (themeToggleBtn) themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                body.classList.remove('dark-theme');
+                if (themeToggleBtn) themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+            
+            // Now set up the rest
             showPage('dashboard');
             document.getElementById('add-employee-button').addEventListener('click', () => openEmployeeModal());
             document.getElementById('import-button').addEventListener('click', openImportModal);
@@ -1624,7 +1665,16 @@
                 themeToggleBtn.innerHTML = body.classList.contains('dark-theme') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
                 updateUI();
             });
-            navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showPage(link.dataset.page); }));
+            // Setup navigation
+            console.log('Setting up navigation with', navLinks.length, 'links');
+            navLinks.forEach((link, index) => {
+                console.log('  Nav link', index, ':', link.dataset.page);
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    console.log('Navigation clicked:', link.dataset.page);
+                    showPage(link.dataset.page);
+                });
+            });
             [employeeSearch, genderFilter, departmentFilter, statusFilter].forEach(el => el.addEventListener('input', renderEmployees));
             window.addEventListener('click', e => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; });
             
