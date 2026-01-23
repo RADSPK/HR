@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1806,7 +1808,8 @@
         };
         
         const renderDepartments = () => {
-            const activeEmps = employees.filter(e => e.Status === 'Active');
+            // Include all employees EXCEPT Inactive
+            const activeEmps = employees.filter(e => e.Status !== 'Inactive');
             const depts = activeEmps.reduce((acc, emp) => {
                 const deptName = emp.Department || 'Unassigned';
                 if (!acc[deptName]) acc[deptName] = { name: deptName, employees: [], employeeCount: 0, maleCount: 0, femaleCount: 0, wfhCount: 0, onLeaveCount: 0, totalCTC: 0 };
@@ -1815,10 +1818,11 @@
                 acc[deptName].totalCTC += parseFloat(emp['Total Cost to Company'] || 0);
                 if (emp.Gender === 'Male') acc[deptName].maleCount++;
                 else if (emp.Gender === 'Female') acc[deptName].femaleCount++;
-                // Track WFH employees
-                if (emp['Work Mode'] === 'WFH' || emp['Work Mode'] === 'Hybrid') acc[deptName].wfhCount++;
-                // Track employees on leave
-                if (emp['Leave Status'] && emp['Leave Status'] !== 'Active') acc[deptName].onLeaveCount++;                return acc;
+                // Track WFH employees - check both Work Mode field and Status field
+                if (emp['Work Mode'] === 'WFH' || emp['Work Mode'] === 'Hybrid' || emp.Status === 'WFH' || emp.Status === 'Work From Home') acc[deptName].wfhCount++;
+                // Track employees on leave - check both Leave Status field and Status field
+                if ((emp['Leave Status'] && emp['Leave Status'] !== 'Active') || emp.Status === 'Annual Leave' || emp.Status === 'Short Leave' || emp.Status === 'On-Leave' || emp.Status === 'On Leave') acc[deptName].onLeaveCount++;
+                return acc;
             }, {});
             departmentGrid.innerHTML = Object.values(depts).map(dept => {
                 const femalePercent = dept.employeeCount > 0 ? ((dept.femaleCount / dept.employeeCount) * 100).toFixed(0) : 0;
